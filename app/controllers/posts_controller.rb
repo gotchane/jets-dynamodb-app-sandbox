@@ -3,7 +3,7 @@ class PostsController < ApplicationController
 
   # GET /posts
   def index
-    @posts = Post.all
+    @posts = Post.scan
   end
 
   # GET /posts/1
@@ -23,7 +23,7 @@ class PostsController < ApplicationController
   def create
     @post = Post.new(post_params)
 
-    if @post.save
+    if @post.replace
       if request.xhr?
         render json: {success: true, location: url_for("/posts/#{@post.id}")}
       else
@@ -36,7 +36,7 @@ class PostsController < ApplicationController
 
   # PUT /posts/1
   def update
-    if @post.update(post_params)
+    if @post.replace(post_params)
       if request.xhr?
         render json: {success: true, location: url_for("/posts/#{@post.id}")}
       else
@@ -49,7 +49,7 @@ class PostsController < ApplicationController
 
   # DELETE /posts/1
   def delete
-    @post.destroy
+    Post.delete(@post.id)
     if request.xhr?
       render json: {success: true}
     else
@@ -64,6 +64,6 @@ private
   end
 
   def post_params
-    params.require(:post).permit(:title)
+    params.require(:post).permit(:title).to_h
   end
 end
